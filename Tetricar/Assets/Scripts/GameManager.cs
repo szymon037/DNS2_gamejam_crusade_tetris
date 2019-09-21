@@ -10,8 +10,13 @@ public class GameManager : MonoBehaviour
         PointsPerSecond = 10;
     public GameState CurrentState = GameState.MAIN_MENU;
     public string[] SceneNames;
+    public float sizeOfBlock;
+    public bool blockAdded = false;
+    public TetrisBlockSpawner tetrisBlockSpawner;
+
 
     static GameManager instance;
+
 
     public enum GameState
     {
@@ -25,6 +30,10 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        tetrisBlockSpawner = GameObject.FindWithTag("TetrisBlockSpawner").GetComponent<TetrisBlockSpawner>();
+        sizeOfBlock = 10f;
+
+        InitGame();
     }
 
     void Awake()
@@ -39,7 +48,13 @@ public class GameManager : MonoBehaviour
     void Update()
     {
 
-        switch(CurrentState)
+        if (blockAdded)
+        {
+            tetrisBlockSpawner.SpawnTetris();
+            blockAdded = false;
+        }
+
+        switch (CurrentState)
         {
             case GameState.GAME:
                 UpdateScoreOverTime();
@@ -95,5 +110,10 @@ public class GameManager : MonoBehaviour
             CurrentScore += PointsPerSecond;
             dtime = 0.0f;
         }
+    }
+
+    public void InitGame()
+    {
+        tetrisBlockSpawner.SpawnTetris();
     }
 }

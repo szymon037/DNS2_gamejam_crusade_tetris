@@ -80,6 +80,6 @@ public class Car : MonoBehaviour
     {
         camera.transform.parent = null;
         rb.constraints = 0;
-        Debug.Log("GameOver");
+        rb.useGravity = true;
     }
 }
