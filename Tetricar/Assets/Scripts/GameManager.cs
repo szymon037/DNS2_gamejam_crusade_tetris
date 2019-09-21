@@ -38,10 +38,18 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        SceneHandling();
 
-        if (CurrentState == GameState.GAME)
-            UpdateScoreOverTime();
+        switch(CurrentState)
+        {
+            case GameState.GAME:
+                UpdateScoreOverTime();
+                break;
+            case GameState.END:
+                Application.Quit();
+                break;
+        }
+
+        SceneHandling();
     }
 
     void SceneHandling()
