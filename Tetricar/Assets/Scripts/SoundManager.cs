@@ -13,7 +13,7 @@ public class SoundManager : MonoBehaviour
     public AudioSource[] Source;
 
     private int CurrentTrack = 0;
-    private bool isMenuMusicPlaying = false;
+    private bool isMenuMusicPlaying = false, isPlayingMusic = true;
     private float DeltaTime = 0.0f, TrackTime;
 
     public void PlayPickUpSound()
@@ -24,11 +24,20 @@ public class SoundManager : MonoBehaviour
     public void PlayBlockSound()
     {
         Source[0].PlayOneShot(BlockSound);
+        isPlayingMusic = true;
     }
 
     public void PlayGameOverSound()
     {
+        Source[0].Stop();
         Source[0].PlayOneShot(GameOverSound);
+        isPlayingMusic = true;
+    }
+
+    public void StopMusic()
+    {
+        isPlayingMusic = false;
+        Source[1].Stop();
     }
 
     public void SwitchToMenuMusic()
@@ -47,28 +56,38 @@ public class SoundManager : MonoBehaviour
         Source[1].PlayOneShot(Music[CurrentTrack]);
     }
 
-    void Start()
+    public void Init()
     {
         Source[0].loop = true;
         Source[0].playOnAwake = true;
         Source[0].clip = CarSound;
 
         Source[0].Play();
+
+        isPlayingMusic = true;
+    }
+
+    void Start()
+    {
+        Init();
     }
 
     void Update()
     {
-        TrackTime = (isMenuMusicPlaying ? MenuMusic.length : Music[CurrentTrack].length);
+        if(isPlayingMusic)
+        {
+            TrackTime = (isMenuMusicPlaying ? MenuMusic.length : Music[CurrentTrack].length);
 
-        if (DeltaTime > TrackTime)
-        {
-            CurrentTrack = (isMenuMusicPlaying ? 0 : (CurrentTrack + 1) % Music.Length);
-            Source[1].PlayOneShot(isMenuMusicPlaying ? MenuMusic : Music[CurrentTrack]);
-            DeltaTime = 0.0f;
-        }
-        else
-        {
-            DeltaTime += Time.deltaTime;
+            if (DeltaTime > TrackTime)
+            {
+                CurrentTrack = (isMenuMusicPlaying ? 0 : (CurrentTrack + 1) % Music.Length);
+                Source[1].PlayOneShot(isMenuMusicPlaying ? MenuMusic : Music[CurrentTrack]);
+                DeltaTime = 0.0f;
+            }
+            else
+            {
+                DeltaTime += Time.deltaTime;
+            }
         }
     }
 }

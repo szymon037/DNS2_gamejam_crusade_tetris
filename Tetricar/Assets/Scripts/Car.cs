@@ -99,6 +99,8 @@ public class Car : MonoBehaviour
         carCamera.transform.parent = null;
         rb.constraints = 0;
         rb.useGravity = true;
+        gm.soundManager.PlayGameOverSound();
+        gm.soundManager.StopMusic();
     }
 
     private void OnTriggerEnter(Collider other)

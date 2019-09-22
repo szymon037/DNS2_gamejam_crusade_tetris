@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour
     public Text text;
     public CameraShaker carCameraShaker;
     public Material[] materials;
+    public SoundManager soundManager;
 
 
     public enum GameState
@@ -37,6 +38,16 @@ public class GameManager : MonoBehaviour
         tetrisBlockSpawner = GameObject.FindWithTag("TetrisBlockSpawner").GetComponent<TetrisBlockSpawner>();
         sizeOfBlock = 10f;
 
+        switch (CurrentState)
+        {
+            case GameState.MAIN_MENU:
+                soundManager.SwitchToMenuMusic();
+                break;
+            case GameState.GAME:
+                soundManager.SwitchToGameMusic();
+                break;
+        }
+
         InitGame();
     }
 
@@ -48,7 +59,6 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         DontDestroyOnLoad(gameObject);
 
-
     }
 
     void Update()
@@ -58,6 +68,7 @@ public class GameManager : MonoBehaviour
         {
             tetrisBlockSpawner.SpawnTetris();
             blockAdded = false;
+            soundManager.PlayBlockSound();
         }
 
         switch (CurrentState)
@@ -81,6 +92,16 @@ public class GameManager : MonoBehaviour
         {
             SceneManager.LoadScene(SceneNames[(int)CurrentState]);
             SceneManager.SetActiveScene(SceneManager.GetSceneByName(SceneNames[(int)CurrentState]));
+
+            switch (CurrentState)
+            {
+                case GameState.MAIN_MENU:
+                    soundManager.SwitchToMenuMusic();
+                    break;
+                case GameState.GAME:
+                    soundManager.SwitchToGameMusic();
+                    break;
+            }
 
             //SceneManager.UnloadSceneAsync(ActualSceneName);
         }
@@ -127,5 +148,6 @@ public class GameManager : MonoBehaviour
     {
         points++;
         text.text = "x " + points.ToString();
+        soundManager.PlayPickUpSound();
     }
 }
