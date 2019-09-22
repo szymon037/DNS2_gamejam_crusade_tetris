@@ -7,6 +7,7 @@ public class Car : MonoBehaviour
     private Transform t;
     private Rigidbody rb;
 
+    public float baseSpeed;
     public float speed;
     public float rotationDuration;
     private bool isRotating = false;
@@ -17,11 +18,15 @@ public class Car : MonoBehaviour
 
     public bool gameOver = false;
     public Camera carCamera;
+
+    private bool hasStarted = false;
+
+    private float timer = 0f;
     void Start()
     {
         t = transform;
         rb = GetComponent<Rigidbody>();
-        speed = 5f;
+        baseSpeed = 10f;
         rotationDuration = 0.2f;
         scale = t.localScale;
         gm = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
@@ -51,6 +56,14 @@ public class Car : MonoBehaviour
         {
             carCamera.GetComponent<CameraShaker>().StartShaking();
         }
+
+        hasStarted = (Input.GetKey(KeyCode.Space) && !hasStarted);
+        
+        if (hasStarted && speed < 150f){
+            speed = baseSpeed + Mathf.Sqrt(timer * 100);
+            timer += Time.deltaTime;
+        }
+        Debug.Log(speed);
     }
 
     private IEnumerator Rotate(Vector3 rotationVector, float rotationAngle)     //rotate Right Left
