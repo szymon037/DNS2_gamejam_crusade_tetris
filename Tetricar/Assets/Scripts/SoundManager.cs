@@ -42,6 +42,7 @@ public class SoundManager : MonoBehaviour
 
     public void SwitchToMenuMusic()
     {
+        Source[0].Stop();
         Source[1].Stop();
         Source[1].PlayOneShot(MenuMusic);
         isMenuMusicPlaying = true;
@@ -51,6 +52,8 @@ public class SoundManager : MonoBehaviour
 
     public void SwitchToGameMusic()
     {
+        Init();
+
         isMenuMusicPlaying = false;
         Source[1].Stop();
         Source[1].PlayOneShot(Music[CurrentTrack]);
