@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEditor;
 
 public class GameManager : MonoBehaviour
 {
@@ -16,8 +17,9 @@ public class GameManager : MonoBehaviour
     public TetrisBlockSpawner tetrisBlockSpawner;
     private int points = 0;
 
-    static GameManager instance;
+    public static GameManager instance;
     public Text text;
+    public Text highscoreText;
     public CameraShaker carCameraShaker;
     public Material[] materials;
 
@@ -48,6 +50,11 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         DontDestroyOnLoad(gameObject);
 
+        try {
+            HighScore = (ulong)PlayerPrefs.GetInt("Highscore");
+        } catch (System.Exception) {}
+
+        highscoreText.text = $"x {HighScore}";
 
     }
 
@@ -66,24 +73,28 @@ public class GameManager : MonoBehaviour
                 UpdateScoreOverTime();
                 break;
             case GameState.END:
-                Application.Quit();
+                RecordHighScore();
+                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
                 break;
         }
 
-        SceneHandling();
+
+       // SceneHandling();
     }
 
     void SceneHandling()
     {
         var ActualSceneName = SceneManager.GetActiveScene().name;
 
-        if (ActualSceneName != SceneNames[(int)CurrentState])
-        {
-            SceneManager.LoadScene(SceneNames[(int)CurrentState]);
-            SceneManager.SetActiveScene(SceneManager.GetSceneByName(SceneNames[(int)CurrentState]));
+        try {
+            if (ActualSceneName != SceneNames[(int)CurrentState])
+            {
+                SceneManager.LoadScene(SceneNames[(int)CurrentState]);
+                SceneManager.SetActiveScene(SceneManager.GetSceneByName(SceneNames[(int)CurrentState]));
 
-            //SceneManager.UnloadSceneAsync(ActualSceneName);
-        }
+                //SceneManager.UnloadSceneAsync(ActualSceneName);
+            }
+        } catch (System.Exception) {}
     }
 
     public void OnCoinPickUp(int value)
@@ -96,6 +107,9 @@ public class GameManager : MonoBehaviour
         if(CurrentScore > HighScore)
         {
             HighScore = CurrentScore;
+            PlayerPrefs.SetInt("Highscore", (int)HighScore);
+            PlayerPrefs.Save();
+            highscoreText.text = $"x {HighScore}";
         }
     }
 

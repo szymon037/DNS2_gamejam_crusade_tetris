@@ -35,33 +35,38 @@ public class Car : MonoBehaviour
 
     void Update()
     {
-        t.Translate(Vector3.forward * speed * Time.deltaTime);
+        if (Time.timeScale == 1) {
+            t.Translate(Vector3.forward * speed * Time.deltaTime);
 
-        if (!gameOver && Input.GetKeyDown(KeyCode.A) && !isRotating && angleOfCar > -90f)
-        {
-            StartCoroutine(Rotate(Vector3.up, -90f));
-        }
-        if (!gameOver && Input.GetKeyDown(KeyCode.D) && !isRotating && angleOfCar < 90f)
-        {
-            StartCoroutine(Rotate(Vector3.up, 90f) );
-        }
+            if (!gameOver && Input.GetKeyDown(KeyCode.A) && !isRotating && angleOfCar > -90f)
+            {
+                StartCoroutine(Rotate(Vector3.up, -90f));
+            }
+            if (!gameOver && Input.GetKeyDown(KeyCode.D) && !isRotating && angleOfCar < 90f)
+            {
+                StartCoroutine(Rotate(Vector3.up, 90f) );
+            }
 
-        if (!gameOver && !Physics.Raycast(t.position, Vector3.down, 5f))
-        {
-            gameOver = true;
-            GameOver();
-        }
+            var hit = !Physics.Raycast(t.position, Vector3.down, 5f);
 
-        if (Input.GetKey(KeyCode.Q))
-        {
-            carCamera.GetComponent<CameraShaker>().StartShaking();
-        }
+            if (!gameOver && hit) 
+            {
+                Debug.Log("Game over!");
+                gameOver = true;
+                GameOver();
+            }
 
-        hasStarted = (Input.GetKey(KeyCode.Space) && !hasStarted);
-        
-        if (hasStarted && speed < 150f){
-            speed = baseSpeed + Mathf.Sqrt(timer * 100);
-            timer += Time.deltaTime;
+            if (Input.GetKey(KeyCode.Q))
+            {
+                carCamera.GetComponent<CameraShaker>().StartShaking();
+            }
+
+            hasStarted = (Input.GetKey(KeyCode.Space) && !hasStarted);
+            
+            if (hasStarted && speed < 150f){
+                speed = baseSpeed + Mathf.Sqrt(timer * 100);
+                timer += Time.deltaTime;
+            }
         }
     }
 
@@ -99,6 +104,7 @@ public class Car : MonoBehaviour
         carCamera.transform.parent = null;
         rb.constraints = 0;
         rb.useGravity = true;
+        GameManager.instance.CurrentState = GameManager.GameState.END;
     }
 
     private void OnTriggerEnter(Collider other)
