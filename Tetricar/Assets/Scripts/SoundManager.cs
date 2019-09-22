@@ -7,6 +7,7 @@ public class SoundManager : MonoBehaviour
     public AudioClip CarSound;
     public AudioClip PickUpSound;
     public AudioClip BlockSound;
+    public AudioClip GameOverSound;
     public AudioClip[] Music;
     public AudioClip MenuMusic;
     public AudioSource[] Source;
@@ -23,6 +24,11 @@ public class SoundManager : MonoBehaviour
     public void PlayBlockSound()
     {
         Source[0].PlayOneShot(BlockSound);
+    }
+
+    public void PlayGameOverSound()
+    {
+        Source[0].PlayOneShot(GameOverSound);
     }
 
     public void SwitchToMenuMusic()
