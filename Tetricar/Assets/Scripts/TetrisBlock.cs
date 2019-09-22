@@ -27,7 +27,7 @@ public class TetrisBlock : MonoBehaviour
     private Queue<Vector3> moveQueue;
     private int maxSizeMoveQueue = 3;
     public bool dropped = false;
-    public List<Transform> subBlocksTransforms;
+    public List<SubBlock> subBlocks;
 
     private float shortestDistance = 9999f;
     private Vector3 nearestBlock;
@@ -160,7 +160,7 @@ public class TetrisBlock : MonoBehaviour
         if (foundBlock)
             secondDropDistance = offsetZ - differenceCentre - gm.sizeOfBlock;
         else
-            secondDropDistance = 1.5f * offsetZ;
+            secondDropDistance = 2f * offsetZ;
 
         dropTimer = 0f;
 
@@ -171,7 +171,11 @@ public class TetrisBlock : MonoBehaviour
             dropTimer += Time.deltaTime;
             yield return null;
         }
-        t.position = new Vector3(t.position.x, t.position.y, nearestBlock.z + differenceCentre + gm.sizeOfBlock);
+        if (foundBlock)
+            t.position = new Vector3(t.position.x, t.position.y, nearestBlock.z + differenceCentre + gm.sizeOfBlock);
+        else
+            t.position = new Vector3(t.position.x, t.position.y, nearestBlock.z + 20f);
+
         BlockAdded();
     }
 
@@ -181,27 +185,37 @@ public class TetrisBlock : MonoBehaviour
 
     private void BlockAdded()
     {
+        if (foundBlock)
+        {
+            SpawnCoins();
+            gm.carCameraShaker.StartShaking();
+        }
         Destroy(rb, 1f);
-        Destroy(GetComponent<TetrisBlock>());
         gm.blockAdded = true;
+        if (!foundBlock)
+            Destroy(gameObject);
+        Destroy(this);
     }
 
     private void FindNearestBlock()
     {
         RaycastHit hit;
 
-        foreach (Transform s_t in subBlocksTransforms)
+        foreach (SubBlock sb in subBlocks)
         {
-            if (Physics.Raycast(s_t.position, Vector3.back, out hit, 500f))
+            if (Physics.Raycast(sb.t.position, Vector3.back, out hit, 500f))
             {
-                float distance = Vector3.Distance(s_t.position, hit.transform.position);
-                if (s_t.parent != hit.transform.parent && distance < shortestDistance)
+                float distance = Vector3.Distance(sb.t.position, hit.transform.position);
+                if (sb.t.parent != hit.transform.parent && distance < shortestDistance)
                 {
                     nearestBlock = hit.transform.position;
                     shortestDistance = distance;
-                    differenceCentre = t.position.z - s_t.position.z;
+                    differenceCentre = t.position.z - sb.t.position.z;
                 }
-                foundBlock = true;
+                if (nearestBlock != Vector3.zero)
+                    foundBlock = true;
+                //Debug.Log("nearestBlock: " + nearestBlock);
+                //Debug.Log("sb.t.position: " + sb.t.position);
             }
         }
         
@@ -221,6 +235,14 @@ public class TetrisBlock : MonoBehaviour
 
 
         //rb.AddForce(Vector3.back * forceValue, ForceMode.Impulse);
+    }
+
+    private void SpawnCoins()
+    {
+        foreach (SubBlock sb in subBlocks)
+        {
+            sb.SpawnCoin();
+        }
     }
 
 }

@@ -6,8 +6,8 @@ using UnityEngine;
 public class CameraShaker : MonoBehaviour
 {
     [SerializeField]
-    private Vector3 translationVector;
-    private Vector3 angularVector;
+    private Vector3 translationVector = Vector3.one* 0.5f;
+    private Vector3 angularVector = Vector3.one * 2f;
     private Transform parentTransform;
     private float perlinSeed;
     private float trauma;
@@ -21,8 +21,8 @@ public class CameraShaker : MonoBehaviour
     void Awake() {
         perlinSeed = Random.value;
         trauma = 1f;
-        translationVector = Vector3.one * 0.5f;
-        angularVector = Vector3.one * 2f;
+        //translationVector = Vector3.one * 0.5f;
+        //angularVector = Vector3.one * 2f;
         parentTransform = this.transform.parent;
         shaking = false;
     }

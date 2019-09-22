@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -13,10 +14,11 @@ public class GameManager : MonoBehaviour
     public float sizeOfBlock;
     public bool blockAdded = false;
     public TetrisBlockSpawner tetrisBlockSpawner;
-
+    private int points = 0;
 
     static GameManager instance;
-
+    public Text text;
+    public CameraShaker carCameraShaker;
 
     public enum GameState
     {
@@ -115,5 +117,12 @@ public class GameManager : MonoBehaviour
     public void InitGame()
     {
         tetrisBlockSpawner.SpawnTetris();
+    }
+
+    public void AddPoint()
+    {
+        points++;
+        text.text = points.ToString();
+        Debug.Log("Points: " + points);
     }
 }

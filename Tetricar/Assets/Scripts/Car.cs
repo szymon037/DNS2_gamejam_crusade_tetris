@@ -13,10 +13,10 @@ public class Car : MonoBehaviour
     public AnimationCurve rotationCurve;
     private float angleOfCar;
     private Vector3 scale = Vector3.zero;
+    private GameManager gm;
 
     public bool gameOver = false;
-    public Camera camera;
-    int i = 0;
+    public Camera carCamera;
     void Start()
     {
         t = transform;
@@ -24,7 +24,8 @@ public class Car : MonoBehaviour
         speed = 5f;
         rotationDuration = 0.2f;
         scale = t.localScale;
-        
+        gm = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
+
     }
 
     void Update()
@@ -44,6 +45,11 @@ public class Car : MonoBehaviour
         {
             gameOver = true;
             GameOver();
+        }
+
+        if (Input.GetKey(KeyCode.Q))
+        {
+            carCamera.GetComponent<CameraShaker>().StartShaking();
         }
     }
 
@@ -78,8 +84,17 @@ public class Car : MonoBehaviour
 
     private void GameOver()
     {
-        camera.transform.parent = null;
+        carCamera.transform.parent = null;
         rb.constraints = 0;
         rb.useGravity = true;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Coin"))
+        {
+            gm.AddPoint();
+            Destroy(other.gameObject);
+        }
     }
 }
