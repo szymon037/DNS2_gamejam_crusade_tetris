@@ -32,6 +32,11 @@ public class PauseMenuFunctions : MonoBehaviour
     void Update() {
         if (Input.GetKeyDown(KeyCode.Escape)) {
             SwitchMenu(!menu.gameObject.activeSelf);
+            if (menu.activeSelf) {
+                GameManager.instance.CurrentState = GameManager.GameState.MAIN_MENU;
+            } else {
+                GameManager.instance.CurrentState = GameManager.GameState.GAME;
+            }
         }
     }
 

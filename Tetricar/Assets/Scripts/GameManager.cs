@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using UnityEditor;
 
 public class GameManager : MonoBehaviour
 {
@@ -22,6 +21,7 @@ public class GameManager : MonoBehaviour
     public Text highscoreText;
     public CameraShaker carCameraShaker;
     public Material[] materials;
+    public SoundManager soundManager;
 
 
     public enum GameState
@@ -39,6 +39,16 @@ public class GameManager : MonoBehaviour
         tetrisBlockSpawner = GameObject.FindWithTag("TetrisBlockSpawner").GetComponent<TetrisBlockSpawner>();
         sizeOfBlock = 10f;
 
+        switch (CurrentState)
+        {
+            case GameState.MAIN_MENU:
+                soundManager.SwitchToMenuMusic();
+                break;
+            case GameState.GAME:
+                soundManager.SwitchToGameMusic();
+                break;
+        }
+
         InitGame();
     }
 
@@ -55,7 +65,6 @@ public class GameManager : MonoBehaviour
         } catch (System.Exception) {}
 
         highscoreText.text = $"x {HighScore}";
-
     }
 
     void Update()
@@ -65,36 +74,45 @@ public class GameManager : MonoBehaviour
         {
             tetrisBlockSpawner.SpawnTetris();
             blockAdded = false;
+            soundManager.PlayBlockSound();
         }
 
         switch (CurrentState)
         {
             case GameState.GAME:
+                soundManager.SwitchToGameMusic();
                 UpdateScoreOverTime();
                 break;
             case GameState.END:
                 RecordHighScore();
-                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                Application.Quit();
+                break;
+            case GameState.MAIN_MENU:
+                soundManager.SwitchToMenuMusic();
                 break;
         }
 
-
-       // SceneHandling();
+     //   SceneHandling();
     }
 
     void SceneHandling()
     {
         var ActualSceneName = SceneManager.GetActiveScene().name;
 
-        try {
-            if (ActualSceneName != SceneNames[(int)CurrentState])
-            {
-                SceneManager.LoadScene(SceneNames[(int)CurrentState]);
-                SceneManager.SetActiveScene(SceneManager.GetSceneByName(SceneNames[(int)CurrentState]));
+        if (ActualSceneName != SceneNames[(int)CurrentState])
+        {
+            SceneManager.LoadScene(SceneNames[(int)CurrentState]);
+            SceneManager.SetActiveScene(SceneManager.GetSceneByName(SceneNames[(int)CurrentState]));
 
-                //SceneManager.UnloadSceneAsync(ActualSceneName);
+            switch (CurrentState)
+            {
+                
+                case GameState.GAME:
+                    break;
             }
-        } catch (System.Exception) {}
+
+            //SceneManager.UnloadSceneAsync(ActualSceneName);
+        }
     }
 
     public void OnCoinPickUp(int value)
@@ -104,12 +122,11 @@ public class GameManager : MonoBehaviour
 
     public void RecordHighScore()
     {
-        if(CurrentScore > HighScore)
+        if((ulong)points > HighScore)
         {
-            HighScore = CurrentScore;
+            HighScore = (ulong)points;
             PlayerPrefs.SetInt("Highscore", (int)HighScore);
             PlayerPrefs.Save();
-            highscoreText.text = $"x {HighScore}";
         }
     }
 
@@ -141,5 +158,6 @@ public class GameManager : MonoBehaviour
     {
         points++;
         text.text = "x " + points.ToString();
+        soundManager.PlayPickUpSound();
     }
 }
