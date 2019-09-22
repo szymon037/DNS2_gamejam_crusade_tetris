@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     public ulong CurrentScore = 0,
         PointsPerSecond = 10;
     public GameState CurrentState = GameState.MAIN_MENU;
+    public GameState PreviousState;
     public string[] SceneNames;
     public float sizeOfBlock;
     public bool blockAdded = false;
@@ -77,19 +78,24 @@ public class GameManager : MonoBehaviour
             soundManager.PlayBlockSound();
         }
 
-        switch (CurrentState)
-        {
-            case GameState.GAME:
-                soundManager.SwitchToGameMusic();
-                UpdateScoreOverTime();
-                break;
-            case GameState.END:
-                RecordHighScore();
-                Application.Quit();
-                break;
-            case GameState.MAIN_MENU:
-                soundManager.SwitchToMenuMusic();
-                break;
+        Debug.Log(CurrentState.ToString());
+
+        if (CurrentState != PreviousState) {
+            switch (CurrentState)
+            {
+                case GameState.GAME:
+                    soundManager.SwitchToGameMusic();
+                    UpdateScoreOverTime();
+                    break;
+                case GameState.END:
+                    RecordHighScore();
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                    break;
+                case GameState.MAIN_MENU:
+                    soundManager.SwitchToMenuMusic();
+                    break;
+            }
+            PreviousState = CurrentState;
         }
 
      //   SceneHandling();

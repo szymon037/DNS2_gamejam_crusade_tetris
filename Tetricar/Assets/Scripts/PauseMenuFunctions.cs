@@ -17,6 +17,7 @@ public class PauseMenuFunctions : MonoBehaviour
         t.text = "RESUME";
         playButton.onClick.RemoveAllListeners();
         playButton.onClick.AddListener(() => ContinueGame());
+        GameManager.instance.CurrentState = GameManager.GameState.GAME;
         SwitchMenu(false);
     }
 
