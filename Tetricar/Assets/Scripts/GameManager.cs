@@ -19,6 +19,8 @@ public class GameManager : MonoBehaviour
     static GameManager instance;
     public Text text;
     public CameraShaker carCameraShaker;
+    public Material[] materials;
+
 
     public enum GameState
     {
@@ -45,6 +47,8 @@ public class GameManager : MonoBehaviour
         else if (instance != this)
             Destroy(gameObject);
         DontDestroyOnLoad(gameObject);
+
+
     }
 
     void Update()
@@ -122,7 +126,6 @@ public class GameManager : MonoBehaviour
     public void AddPoint()
     {
         points++;
-        text.text = points.ToString();
-        Debug.Log("Points: " + points);
+        text.text = "x " + points.ToString();
     }
 }

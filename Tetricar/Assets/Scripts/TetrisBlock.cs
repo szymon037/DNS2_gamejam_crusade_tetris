@@ -22,6 +22,12 @@ public class TetrisBlock : MonoBehaviour
     public AnimationCurve dropCurve;
     public float dropDistance = 40f;
 
+    // Spawn Ease In
+    private bool spawnEaseIn = false;
+    private float spawnEaseInDuration = 0.65f;
+    public AnimationCurve easeInCurve;
+    public float spawnDistance = 45f;
+
     public float forceValue = 0f;
     private GameManager gm;
     private Queue<Vector3> moveQueue;
@@ -36,6 +42,7 @@ public class TetrisBlock : MonoBehaviour
     private bool foundBlock = false;
     private Transform car;
     private float differenceCentre = 0f;
+    private float timer = 0f;
 
     [SerializeField] private GameObject explosion_particle;
 
@@ -45,50 +52,59 @@ public class TetrisBlock : MonoBehaviour
         rb = GetComponent<Rigidbody>();
 
         rotationDuration = 0.15f;
-        movingDuration = 0.2f;
+        movingDuration = 0.15f;
         dropDuration = 0.2f;
         forceValue = 100f;
         moveQueue = new Queue<Vector3>();
         car = GameObject.FindWithTag("Player").GetComponent<Transform>(); ;
 
-
         gm = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
+        ChangeColors();
+
+        //Debug.Log("t.position: " + t.position);
+        StartCoroutine(SpawnEaseIn());
         
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.UpArrow))
+        if (!spawnEaseIn)
         {
-            StartCoroutine(Rotate(Vector3.up, 90f));
-        }
+            if (Input.GetKeyDown(KeyCode.UpArrow))
+            {
+                StartCoroutine(Rotate(Vector3.up, 90f));
+            }
 
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            //StartCoroutine(Move(Vector3.left));
+            if (Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                //StartCoroutine(Move(Vector3.left));
 
-            if (moveQueue.Count < maxSizeMoveQueue)
-                moveQueue.Enqueue(Vector3.left);
-        }
+                if (moveQueue.Count < maxSizeMoveQueue)
+                    moveQueue.Enqueue(Vector3.left);
+            }
 
-        if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            //StartCoroutine(Move(Vector3.right));
+            if (Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                //StartCoroutine(Move(Vector3.right));
 
-            if (moveQueue.Count < maxSizeMoveQueue)
-                moveQueue.Enqueue(Vector3.right);
+                if (moveQueue.Count < maxSizeMoveQueue)
+                    moveQueue.Enqueue(Vector3.right);
 
-        }
+            }
 
-        if (!isMoving && moveQueue.Count > 0)
-        {
-            StartCoroutine(Move(moveQueue.Dequeue()));
-        }
+            if (!isMoving && moveQueue.Count > 0)
+            {
+                StartCoroutine(Move(moveQueue.Dequeue()));
+            }
 
-        if (Input.GetKeyDown(KeyCode.Space) && !isRotating && !isMoving)
-        {
-            Drop();
-            dropped = true;
+            if (Input.GetKeyDown(KeyCode.Space) && !isRotating && !isMoving)
+            {
+                Drop();
+                dropped = true;
+            }
+            if (!dropped)
+                t.position = new Vector3(t.position.x, Mathf.Sin(timer * 3f) * 4f, t.position.z);
+            timer += Time.deltaTime;
         }
 
     }
@@ -143,6 +159,7 @@ public class TetrisBlock : MonoBehaviour
     {
         t.parent = null;
         float dropTimer = 0f;
+        t.position = new Vector3(t.position.x, 0f, t.position.z);
         Vector3 startPosition = t.position;
         Vector3 endPosition = Vector3.zero;
 
@@ -181,7 +198,23 @@ public class TetrisBlock : MonoBehaviour
         BlockAdded();
     }
 
-    
+    private IEnumerator SpawnEaseIn()
+    {
+        float movingTimer = 0f;
+        Vector3 startPosition = t.position;
+        spawnEaseIn = true;
+
+        while (movingTimer < spawnEaseInDuration)
+        {
+            float movingPercentage = movingTimer / spawnEaseInDuration;
+            t.position = new Vector3(startPosition.x, startPosition.y, t.parent.position.z + spawnDistance) + (Vector3.back * easeInCurve.Evaluate(movingPercentage) * spawnDistance);
+            movingTimer += Time.deltaTime;
+            yield return null;
+        }
+        t.position = new Vector3(startPosition.x, startPosition.y, t.parent.position.z + spawnDistance) + Vector3.back * spawnDistance;
+        //Debug.Log(new Vector3(startPosition.x, startPosition.y, t.parent.position.z) + Vector3.back * spawnDistance);
+        spawnEaseIn = false;
+    }
 
     
 
@@ -231,10 +264,10 @@ public class TetrisBlock : MonoBehaviour
         FindNearestBlock();
         if (foundBlock)
         {
-            teleportPoint = new Vector3(t.position.x, t.position.y, nearestBlock.z + offsetZ);
+            teleportPoint = new Vector3(t.position.x, 0f, nearestBlock.z + offsetZ);
         }
         else
-            teleportPoint = new Vector3(t.position.x, t.position.y, car.position.z + offsetZ);
+            teleportPoint = new Vector3(t.position.x, 0f, car.position.z + offsetZ);
 
         StartCoroutine(DropCoroutine());
 
@@ -247,6 +280,17 @@ public class TetrisBlock : MonoBehaviour
         foreach (SubBlock sb in subBlocks)
         {
             sb.SpawnCoin();
+        }
+    }
+
+    private void ChangeColors()
+    {
+        Material mat = gm.materials[Random.Range(0, gm.materials.Length)];
+        foreach (SubBlock sb in subBlocks)
+        {
+            Debug.Log("KURWAAAAAAAAAAAAAAAAAAAAA");
+
+            sb.ChangeColor(mat);
         }
     }
 

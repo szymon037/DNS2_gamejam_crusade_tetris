@@ -9,6 +9,8 @@ public class TetrisBlockSpawner : MonoBehaviour
     private GameManager gm;
     private Transform car;
     private float offsetZ = 0f;
+    [SerializeField]
+    private Transform spawnPoint;
 
     void Awake()
     {
@@ -27,6 +29,10 @@ public class TetrisBlockSpawner : MonoBehaviour
 
     public void SpawnTetris()
     {
-        Instantiate(blockRandomizer.GetRandomBlock(), t.position + new Vector3(Mathf.Round(Random.Range(-3f, 3f)) * gm.sizeOfBlock, 0f, 0f), Quaternion.Euler(new Vector3(0f, Mathf.Round(Random.Range(-3f, 3f)) * 90f, 0f)), t);
+        float sign = Mathf.Sign(Random.Range(-1f, 1f));
+        float position = Mathf.Round(Random.Range(2f, 3f));
+        Instantiate(blockRandomizer.GetRandomBlock(), spawnPoint.position + new Vector3(position * sign * gm.sizeOfBlock, 0f, 0f), Quaternion.Euler(new Vector3(0f, Mathf.Round(Random.Range(-3f, 3f)) * 90f, 0f)), t);
+        //Debug.Log("spawnPoint.position: " + spawnPoint.position);
+        //Instantiate(blockRandomizer.GetRandomBlock(), t.position + new Vector3(Mathf.Round(Random.Range(-3f, 3f)) * gm.sizeOfBlock, 0f, 0f), Quaternion.Euler(new Vector3(0f, Mathf.Round(Random.Range(-3f, 3f)) * 90f, 0f)), t);
     }
 }

@@ -63,7 +63,6 @@ public class Car : MonoBehaviour
             speed = baseSpeed + Mathf.Sqrt(timer * 100);
             timer += Time.deltaTime;
         }
-        Debug.Log(speed);
     }
 
     private IEnumerator Rotate(Vector3 rotationVector, float rotationAngle)     //rotate Right Left

@@ -9,7 +9,7 @@ public class SubBlock : MonoBehaviour
     public GameObject coin_prefab;
     public float chanceOfCoinSpawn = 0.25f;
     public float coinHeight = 2f;
-
+    private Material material;
     void Start()
     {
         t = transform;
@@ -18,11 +18,14 @@ public class SubBlock : MonoBehaviour
             tb = t.parent.GetComponent<TetrisBlock>();
             tb.subBlocks.Add(this);
         }
+        Debug.Log(GetComponent<MeshRenderer>().material.color);
+
         /*else
         {
             Debug.Log("NULL");
         }*/
 
+        material = GetComponent<MeshRenderer>().material;
     }
 
     void Update()
@@ -37,5 +40,10 @@ public class SubBlock : MonoBehaviour
         {
             Instantiate(coin_prefab, new Vector3(t.position.x, t.position.y + coinHeight, t.position.z), Quaternion.Euler(new Vector3(0f, 90f, 45f)));
         }
+    }
+
+    public void ChangeColor(Material mat)
+    {
+        Debug.Log(GetComponent<MeshRenderer>().material.color.r);
     }
 }
