@@ -37,6 +37,8 @@ public class TetrisBlock : MonoBehaviour
     private Transform car;
     private float differenceCentre = 0f;
 
+    [SerializeField] private GameObject explosion_particle;
+
     void Start()
     {
         t = transform;
@@ -189,6 +191,9 @@ public class TetrisBlock : MonoBehaviour
         {
             SpawnCoins();
             gm.carCameraShaker.StartShaking();
+            //Instant part
+            GameObject particle = Instantiate(explosion_particle, new Vector3(nearestBlock.x, nearestBlock.y, nearestBlock.z + gm.sizeOfBlock * 0.5f), Quaternion.identity);
+            Destroy(particle, 2.5f);
         }
         Destroy(rb, 1f);
         gm.blockAdded = true;

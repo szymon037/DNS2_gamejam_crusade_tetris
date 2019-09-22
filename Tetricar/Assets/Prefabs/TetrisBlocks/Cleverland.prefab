@@ -126,7 +126,9 @@ MonoBehaviour:
   dropDistance: 40
   forceValue: 0
   dropped: 0
-  subBlocksTransforms: []
+  subBlocks: []
+  explosion_particle: {fileID: 455107017446595550, guid: 852f4175c0ffab4438830d8f9213075d,
+    type: 3}
 --- !u!1 &9164558966587306248
 GameObject:
   m_ObjectHideFlags: 0
