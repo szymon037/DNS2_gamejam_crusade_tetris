@@ -78,7 +78,6 @@ public class GameManager : MonoBehaviour
             soundManager.PlayBlockSound();
         }
 
-        Debug.Log(CurrentState.ToString());
 
         if (CurrentState != PreviousState) {
             switch (CurrentState)

@@ -51,7 +51,7 @@ public class Car : MonoBehaviour
 
             if (!gameOver && hit) 
             {
-                Debug.Log("Game over!");
+                //Debug.Log("Game over!");
                 gameOver = true;
                 GameOver();
             }
@@ -64,7 +64,7 @@ public class Car : MonoBehaviour
             hasStarted = (Input.GetKey(KeyCode.Space) && !hasStarted);
             
             if (hasStarted && speed < 150f){
-                speed = baseSpeed + Mathf.Sqrt(timer * 100);
+                speed = baseSpeed + Mathf.Sqrt(timer * 80);
                 timer += Time.deltaTime;
             }
         }

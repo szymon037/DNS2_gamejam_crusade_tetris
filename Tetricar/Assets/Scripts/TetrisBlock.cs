@@ -43,14 +43,17 @@ public class TetrisBlock : MonoBehaviour
     private Transform car;
     private float differenceCentre = 0f;
     private float timer = 0f;
-
+    private Vector3 actualCoroutineVector;
     [SerializeField] private GameObject explosion_particle;
+    float maxOffsetX = 6;
+    float initialOffsetX = 0;
+    float actualOffsetX = 0;
 
     void Start()
     {
         t = transform;
         rb = GetComponent<Rigidbody>();
-
+        initialOffsetX = t.position.x * 0.1f;
         rotationDuration = 0.15f;
         movingDuration = 0.15f;
         dropDuration = 0.2f;
@@ -70,12 +73,17 @@ public class TetrisBlock : MonoBehaviour
     {
         if (!spawnEaseIn)
         {
-            if (Input.GetKeyDown(KeyCode.UpArrow))
+            if (Input.GetKeyDown(KeyCode.UpArrow) )
             {
                 StartCoroutine(Rotate(Vector3.up, 90f));
             }
 
-            if (Input.GetKeyDown(KeyCode.LeftArrow))
+            if (Input.GetKeyDown(KeyCode.DownArrow))
+            {
+                StartCoroutine(Rotate(Vector3.up, -90f));
+            }
+
+            if (Input.GetKeyDown(KeyCode.LeftArrow) && actualOffsetX >= -maxOffsetX - initialOffsetX)
             {
                 //StartCoroutine(Move(Vector3.left));
 
@@ -83,7 +91,7 @@ public class TetrisBlock : MonoBehaviour
                     moveQueue.Enqueue(Vector3.left);
             }
 
-            if (Input.GetKeyDown(KeyCode.RightArrow))
+            if (Input.GetKeyDown(KeyCode.RightArrow) && actualOffsetX <= maxOffsetX - initialOffsetX)
             {
                 //StartCoroutine(Move(Vector3.right));
 
@@ -92,16 +100,29 @@ public class TetrisBlock : MonoBehaviour
 
             }
 
-            if (!isMoving && moveQueue.Count > 0)
+            if (/*!isMoving && */moveQueue.Count > 0)
             {
-                StartCoroutine(Move(moveQueue.Dequeue()));
+                if (isMoving)
+                    StopCoroutine(Move(actualCoroutineVector));
+                if (!isMoving)
+                    StartCoroutine(Move(moveQueue.Dequeue()));
             }
 
-            if (Input.GetKeyDown(KeyCode.Space) && !isRotating && !isMoving)
+            if (Input.GetKeyDown(KeyCode.Space) && !isRotating /*&& !isMoving*/)
             {
-                Drop();
+                if (isMoving)
+                    StopCoroutine(Move(actualCoroutineVector));
+                moveQueue.Clear();
+
+
+                //Drop();
                 dropped = true;
             }
+            if (dropped && !isMoving)
+            {
+                Drop();
+            }
+
             if (!dropped)
                 t.position = new Vector3(t.position.x, Mathf.Sin(timer * 3f) * 4f, t.position.z);
             timer += Time.deltaTime;
@@ -139,20 +160,23 @@ public class TetrisBlock : MonoBehaviour
 
     private IEnumerator Move(Vector3 direction)
     {
+        actualOffsetX += direction.x;
         isMoving = true;
+        actualCoroutineVector = direction;
         float movingTimer = 0f;
         Vector3 startPosition = t.position;
-
         while (movingTimer < movingDuration)
         {
             float movingPercentage = movingTimer / movingDuration;
             //t.Translate(direction * movingCurve.Evaluate(movingPercentage) * sizeOfBlock);
-            t.position = new Vector3(startPosition.x, startPosition.y, t.position.z) + (direction * movingCurve.Evaluate(movingPercentage) * gm.sizeOfBlock);
+            t.position = new Vector3(startPosition.x, t.position.y, t.position.z) + (direction * movingCurve.Evaluate(movingPercentage) * gm.sizeOfBlock);
             movingTimer += Time.deltaTime;
             yield return null;
         }
-        t.position = new Vector3(startPosition.x, startPosition.y, t.position.z) + direction * gm.sizeOfBlock;
+        t.position = new Vector3(startPosition.x, t.position.y, t.position.z) + direction * gm.sizeOfBlock;
         isMoving = false;
+        actualCoroutineVector = Vector3.zero;
+
     }
 
     private IEnumerator DropCoroutine()

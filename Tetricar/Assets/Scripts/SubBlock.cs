@@ -18,7 +18,7 @@ public class SubBlock : MonoBehaviour
             tb = t.parent.GetComponent<TetrisBlock>();
             tb.subBlocks.Add(this);
         }
-        Debug.Log(GetComponent<MeshRenderer>().material.color);
+
 
         /*else
         {
